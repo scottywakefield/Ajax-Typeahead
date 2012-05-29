@@ -51,7 +51,8 @@
 				loadingClass : ajax.loadingClass || null,
 				displayField : ajax.displayField || null,
 				preDispatch : ajax.preDispatch || null,
-				preProcess : ajax.preProcess || null
+				preProcess : ajax.preProcess || null,
+				contentType: ajax.contentType || "application/json; charset=utf-8"
 			}
 			this.query = "";
 		} else {
@@ -132,10 +133,16 @@
 				// Cancel last call if already in progress
 				if (this.ajax.xhr) this.ajax.xhr.abort();
 				
-				var params = this.ajax.preDispatch ? this.ajax.preDispatch(query) : { query : query }
-				var jAjax = (this.ajax.method == "post") ? $.post : $.get;
-				this.ajax.xhr = jAjax(this.ajax.url, params, $.proxy(this.ajaxSource, this));
-				this.ajax.timerId = null;
+				var params = this.ajax.preDispatch ? this.ajax.preDispatch(query) : { query: query }
+		                this.ajax.xhr = $.ajax({
+		                    type: this.ajax.method,
+		                    url: this.ajax.url,
+		                    contentType: this.ajax.contentType,
+		                    datatype: "json",
+		                    data: params,
+		                    success: $.proxy(this.ajaxSource, this)
+		                });
+		                this.ajax.timerId = null;
 			}
 			
 			// Query is good to send, set a timer
